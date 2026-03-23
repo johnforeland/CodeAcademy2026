@@ -20,6 +20,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           cache: yarn
+          cache-dependency-path: 1-DevOps/idempotweet
       - run: corepack enable
         working-directory: .
       - name: Get yarn cache directory path
