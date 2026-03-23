@@ -1,30 +1,24 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-      - master
-    paths-ignore:
-      - '**.md'
   pull_request:
     types: [opened, synchronize, reopened]
-    paths-ignore:
-      - '**.md'
-  workflow_dispatch:
-
+    paths:
+      - '1-DevOps/idempotweet/**'
+  workflow_call:
+defaults:
+  run:
+    working-directory: 1-DevOps/idempotweet
 jobs:
-  build:
+  ci:
 
-    name: Build with bun latest
-    runs-on: ubuntu-latest
+    name: ci
+    runs-on: ${{ vars.RUNNER || 'self-hosted' }}
 
     steps:
       - uses: actions/checkout@v6
-      - run: cd 1-DevOps/idempotweet
       - uses: actions/setup-node@v6
         with:
-          node-version: 25
           cache: yarn
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -37,5 +31,14 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - run: yarn install
+      - run: corepack enable
+        working-directory: .
+      - run: yarn install --immutable
       - run: yarn test
+      - run: yarn test:coverage
+      - uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          projectBaseDir: 1-DevOps/idempotweet
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
