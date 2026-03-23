@@ -2,6 +2,7 @@
 
 A demo application showcasing a Twitter-like feed of "idems" (idempotent tweets) built with Next.js 16, React 19, and TanStack Query.
 
+
 ## Features
 
 - **Infinite scroll** - 200 idems loaded progressively as you scroll

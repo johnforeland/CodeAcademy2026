@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - '1-DevOps/idempotweet/**'
+  workflow_call:
+defaults:
+  run:
+    working-directory: 1-DevOps/idempotweet
+jobs:
+  ci:
+
+    name: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+      - run: corepack enable
+        working-directory: .
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v5
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn install --immutable
+      - run: yarn test
+      - run: yarn test:coverage --coverage.reportOnFailure
+        continue-on-error: true
+      - uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          projectBaseDir: 1-DevOps/idempotweet
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
