@@ -33,7 +33,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn install --immutable
       - run: yarn test
-      - run: yarn test:coverage
+      - run: yarn test:coverage --coverage.reportOnFailure
       - uses: SonarSource/sonarqube-scan-action@v6
         with:
           projectBaseDir: 1-DevOps/idempotweet
