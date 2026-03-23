@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  push:
   pull_request:
     paths:
       - '1-DevOps/idempotweet/**'
@@ -17,6 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
+        with:
+          cache: yarn
       - run: corepack enable
         working-directory: .
       - name: Get yarn cache directory path
